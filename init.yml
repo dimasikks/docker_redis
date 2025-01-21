@@ -1,0 +1,7 @@
+- name: ANSIBLE INSTALL REDIS+DOCKER
+  gather_facts: false
+  hosts: all
+  roles:
+    - ../roles/docker_install
+    - ../roles/redis_install
+

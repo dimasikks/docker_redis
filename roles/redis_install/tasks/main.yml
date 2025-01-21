@@ -1,0 +1,70 @@
+---
+- name: MAKE DIRECTORY FOR DOCKER REDIS
+  ansible.builtin.file:
+    path: "{{ redis_directory }}"
+    state: directory
+
+- name: COPY DOCKER-COMPOSE.J2 TO DOCKER REDIS DIRECTORY
+  ansible.builtin.template:
+    src: "docker-compose.yml.j2"
+    dest: "{{ redis_directory }}/docker-compose.yml"
+
+- name: START DOCKER
+  ansible.builtin.debug:
+    msg: "START DOCKER"
+  notify: START DOCKER
+  tags: [ start_docker ]
+
+- name: STOP CONTAINER IF EXISTS (1)
+  become: true
+  ansible.builtin.shell: |
+    docker ps -a | grep "{{ container_name }}" | wc -l
+  register: redis_container_status
+  ignore_errors: yes
+  tags: [ stop_container ]
+
+- name: STOP CONTAINER IF EXISTS (2)
+  become: true
+  ansible.builtin.command:
+    cmd: docker container stop "{{ container_name }}"
+  when: redis_container_status.stdout_lines[0] | int > 0
+  ignore_errors: yes
+  tags: [ stop_container ]
+
+- name: CHECK DOCKER-COMPOSE COMMAND
+  ansible.builtin.command:
+    cmd: which docker-compose
+  register: docker_compose_status
+
+- name: START DOCKER WITH DOCKER-COMPOSE
+  become: true
+  ansible.builtin.command:
+    cmd: docker-compose up -d
+    chdir: "{{ redis_directory }}"
+  when: docker_compose_status.rc==0
+
+- name: START DOCKER WITH DOCKER COMPOSE
+  become: true
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: "{{ redis_directory }}"
+  when: docker_compose_status.rc!=0
+
+- name: WAITING CONTAINER TO START (5 SEC)
+  ansible.builtin.pause:
+   seconds: 5
+
+- name: GET STATUS CONTAINER
+  become: true
+  ansible.builtin.command: 
+    cmd: docker inspect -f "{{ '{{.State.Status}}' }}" {{ container_name }}
+  register: redis_status
+  failed_when: redis_status.stdout not in ['running','dead','exited','created','restarted']
+  tags: [ check_status ]
+
+- name: SHOW STATUS CONTAINER
+  ansible.builtin.debug:
+    msg: "CONTAINER HAS STATUS: {{ redis_status.stdout }}"
+  tags: [ check_status ]
+
+  

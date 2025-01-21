@@ -1,0 +1,12 @@
+---
+redis_directory: /home/user/redis
+image: redis:3.2.6-alpine
+container_name: redis_container
+redis_port_out: 6379
+redis_path_mount: /data
+redis_path_data: /root/redis
+redis_password: redis
+redis_databases: 16
+redis_network: redis_network
+redis_ip4address: 172.20.10.7
+redis_ip4subnet: 172.20.10.0/24
