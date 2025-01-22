@@ -52,4 +52,4 @@
 
 - name: PREPARING TO REDIS INSTALL . . .
   ansible.builtin.pause:
-   seconds: 5ll
+   seconds: 5
