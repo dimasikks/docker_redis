@@ -34,7 +34,7 @@
 
 - name: OFF INTERACTIVE MODE
   become: true
-  ansible.builtin.shell: sudo -i echo "export DEBIAN_FRONTEND=noninteractive" >> /root/.bashrc && sudo -i source /root/.bashrc
+  ansible.builtin.shell: sudo -i export DEBIAN_FRONTEND=noninteractive
 
 - name: INSTALL MARIADB
   become: true
