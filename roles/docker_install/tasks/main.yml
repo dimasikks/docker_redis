@@ -8,25 +8,21 @@
       - software-properties-common
     state: present
     update_cache: yes
-  tags: [ packages ]
 
 - name: ADDING DOCKER KEY
   become: true
-  ansible.builtin.shell: curl -fsSL https://download.docker.com/linux/{{ distr }}/gpg | sudo apt-key add -;
-  tags: [ base_install ]
+  ansible.builtin.shell: curl -fsSL https://download.docker.com/linux/{{ distr }}/gpg | apt-key add -;
 
 - name: TAKE DISTRO NAME
   ansible.builtin.command:
     cmd: lsb_release -cs
   register: dist
-  tags: [ base_install ]
 
 - name: ADDING DOCKER DEB SOURCE
   become: true
   ansible.builtin.apt_repository:
     repo: "deb [arch=amd64] https://download.docker.com/linux/{{ distr }} {{ dist.stdout }} stable"
     state: present
-  tags: [ base_install ]
 
 - name: UPDATE PACKAGES && INSTALL DOCKER
   become: true
@@ -37,19 +33,16 @@
     update_cache: yes
     state: latest
   notify: START DOCKER
-  tags: [ base_instal, docker_packages_install ]
 
 - name: COLLECT INFORMATION ABOUT PACKAGES
   ansible.builtin.package_facts:
-  tags: [ packages, debug ]
 
 - name: DOCKER RESULT
   ansible.builtin.debug:
     msg: 
       "DOCKER: {{ ('docker-ce' in ansible_facts.packages) | ternary('Installed Successfully', 'Not installed') }},
       DOCKER-COMPOSE: {{ ('docker-compose' in ansible_facts.packages) | ternary('Installed Successfully', 'Not installed') }}"
-  tags: [ debug ]
 
-- name: PREPARING TO REDIS INSTALL . . .
+- name: DOCKER INSTALLATION FINISHED
   ansible.builtin.pause:
-   seconds: 5
+   seconds: 3

@@ -1,7 +1,14 @@
 all:
   hosts:
-    host01:
-      ansible_user: your_user
-      ansible_host: your_address
-      ansible_password: your_password
-    
+    test-server:
+      ansible_user: 
+      ansible_host: 
+      ansible_password: 
+    # :
+    #   ansible_user: 
+    #   ansible_host: 
+    #   ansible_password: 
+    # :
+    #   ansible_user: 
+    #   ansible_host: 
+    #   ansible_password: 

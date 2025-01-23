@@ -1,0 +1,11 @@
+---
+distr: ubuntu
+version_main: 10.3
+version: 10.3.39
+debs:
+ - deb [arch=amd64] https://archive.mariadb.org/repo/{{ version }}/{{ distr }} focal main
+ - deb http://security.ubuntu.com/ubuntu focal-security main
+package_dir: /home/user/mariadb_install_packages
+packages:
+ - http://launchpadlibrarian.net/510434964/multiarch-support_2.27-3ubuntu1.4_amd64.deb
+ - http://launchpadlibrarian.net/83107404/libreadline5_5.2-11_amd64.deb

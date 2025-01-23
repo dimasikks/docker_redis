@@ -1,7 +1,18 @@
-- name: ANSIBLE INSTALL REDIS+DOCKER
+- name: CONFIGURE VISP-2
   gather_facts: false
-  hosts: all
+  hosts: visp-2
   roles:
-    - ../roles/docker_install
-    - ../roles/redis_install
+    - role: ../roles/docker_install
+      tags: [ docker_install ]
+    - role: ../roles/redis_install
+      tags: [ redis_install ]
+    - role: ../roles/mariadb_install
+      tags: [ mariadb_install ]
+
+- name: CONFIGURE VISP-3
+  gather_facts: false
+  hosts: visp-3, test-server
+  roles:
+    - role: ../roles/mariadb_install
+      tags: [ mariadb_install ]
 

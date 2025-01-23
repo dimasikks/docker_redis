@@ -13,7 +13,6 @@
   ansible.builtin.debug:
     msg: "START DOCKER"
   notify: START DOCKER
-  tags: [ start_docker ]
 
 - name: STOP CONTAINER IF EXISTS (1)
   become: true
@@ -21,7 +20,6 @@
     docker ps -a | grep "{{ container_name }}" | wc -l
   register: redis_container_status
   ignore_errors: yes
-  tags: [ stop_container ]
 
 - name: STOP CONTAINER IF EXISTS (2)
   become: true
@@ -29,7 +27,6 @@
     cmd: docker container stop "{{ container_name }}"
   when: redis_container_status.stdout_lines[0] | int > 0
   ignore_errors: yes
-  tags: [ stop_container ]
 
 - name: CHECK DOCKER-COMPOSE COMMAND
   ansible.builtin.command:
@@ -60,11 +57,11 @@
     cmd: docker inspect -f "{{ '{{.State.Status}}' }}" {{ container_name }}
   register: redis_status
   failed_when: redis_status.stdout not in ['running','dead','exited','created','restarted']
-  tags: [ check_status ]
 
 - name: SHOW STATUS CONTAINER
   ansible.builtin.debug:
     msg: "CONTAINER HAS STATUS: {{ redis_status.stdout }}"
-  tags: [ check_status ]
 
-  
+- name: REDIS INSTALLATION FINISHED
+  ansible.builtin.pause:
+   seconds: 3

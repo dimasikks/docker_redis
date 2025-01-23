@@ -1,0 +1,59 @@
+---
+- name: INSTALL CURL
+  become: true
+  ansible.builtin.apt:
+    name:
+      - curl
+      - libtinfo5
+      - apt-transport-https
+    state: present
+    update_cache: true
+
+- name: ADDING MARIADB SIGN KEY
+  become: true
+  ansible.builtin.shell: curl -fsSL https://supplychain.mariadb.com/mariadb-keyring-2019.gpg | apt-key add -;
+
+- name: ADDING MARIADB DEB SOURCE
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "{{ item }}"
+    state: present
+  loop: "{{ debs }}"
+
+- name: MAKE DIRECTORY FOR DEB PACKAGES
+  ansible.builtin.file:
+    path: "{{ package_dir }}"
+    state: directory
+
+- name: DOWNLOAD DEB PACKAGES FOR MARIADB
+  become: true
+  ansible.builtin.shell: wget {{ item }} && dpkg -i $(echo {{ item }} | tr '/' ' ' | awk '{print $NF}')
+  loop: "{{ packages }}"
+  args:
+    chdir: "{{ package_dir }}"
+
+- name: OFF INTERACTIVE MODE
+  become: true
+  ansible.builtin.shell: sudo -i echo "export DEBIAN_FRONTEND=noninteractive" >> /root/.bashrc && sudo -i source /root/.bashrc
+
+- name: INSTALL MARIADB
+  become: true
+  ansible.builtin.shell: sudo -i apt-get install mariadb-server-{{ version_main }} -y
+
+- name: CHECK VERSION
+  become: true
+  ansible.builtin.command:
+    cmd: mysql --version
+  register: mariadb_version
+
+- name: COLLECT INFORMATION ABOUT PACKAGES
+  ansible.builtin.package_facts:
+
+- name: MARIADB RESULT
+  ansible.builtin.debug:
+    msg: 
+      "MARIADB: {{ ('mariadb' or 'mysql' in ansible_facts.packages) | ternary('Installed Successfully', 'Not installed') }}, VERSION INFO: {{ mariadb_version.stdout }}"
+
+- name: MARIADB INSTALLATION FINISHED
+  ansible.builtin.pause:
+   seconds: 3
