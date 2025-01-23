@@ -1,4 +1,4 @@
-# How to install Docker and Redis in Docker?
+# How to install Docker, Redis in Docker and MySQL?
 
 **To start installation configure all vars/main.yml and invenotry.yml files, then make sure that your user is a member of sudo group.**
 
