@@ -1,13 +1,14 @@
 ---
-- name: INSTALL CURL
+- name: INSTALL NECESSARY PACKAGES
   become: true
   ansible.builtin.apt:
-    name:
-      - curl
-      - libtinfo5
-      - apt-transport-https
+    name: "{{ item }}"
     state: present
     update_cache: true
+  loop:
+    - curl
+    - libtinfo5
+    - apt-transport-https
 
 - name: ADDING MARIADB SIGN KEY
   become: true
@@ -32,13 +33,9 @@
   args:
     chdir: "{{ package_dir }}"
 
-- name: OFF INTERACTIVE MODE
-  become: true
-  ansible.builtin.shell: sudo -i export DEBIAN_FRONTEND=noninteractive
-
 - name: INSTALL MARIADB
   become: true
-  ansible.builtin.shell: sudo -i apt-get install mariadb-server-{{ version_main }} -y
+  ansible.builtin.shell: DEBIAN_FRONTEND=noninteractive apt-get install mariadb-server-{{ version_main }} -y -q
 
 - name: CHECK VERSION
   become: true

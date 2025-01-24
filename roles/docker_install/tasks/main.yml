@@ -1,13 +1,14 @@
-- name: INSTALL PACKAGES
+- name: INSTALL NECESSARY PACKAGES
   become: true
   ansible.builtin.apt:
-    name:
-      - apt-transport-https
-      - ca-certificates
-      - curl
-      - software-properties-common
+    name: "{{ item }}"
     state: present
     update_cache: yes
+  loop:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
 
 - name: ADDING DOCKER KEY
   become: true
@@ -27,12 +28,13 @@
 - name: UPDATE PACKAGES && INSTALL DOCKER
   become: true
   ansible.builtin.apt:
-    name:
-      - docker-ce
-      - docker-compose
+    name: "{{ item }}"
     update_cache: yes
     state: latest
   notify: START DOCKER
+  loop:
+    - docker-ce
+    - docker-compose
 
 - name: COLLECT INFORMATION ABOUT PACKAGES
   ansible.builtin.package_facts:
