@@ -1,4 +1,4 @@
-# How to install Docker, Redis in Docker and MySQL?
+# How to install Docker, Redis in Docker, MySQL and configure MySQL Galera-cluster?
 
 **To start installation configure all vars/main.yml and invenotry.yml files, then make sure that your user is a member of sudo group.**
 
