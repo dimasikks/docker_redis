@@ -1,2 +1,56 @@
 ---
-# tasks file for galera_cluster_install
+- name: STOP MARIADBS
+  become: true
+  ansible.builtin.debug:
+    msg: STOPPING MARIADBS
+  notify: STOP MARIADB
+  when: inventory_hostname != "visp-1"
+
+- name: COPY CONFIG FILES
+  become: true
+  ansible.builtin.template:
+    src: "galera.cnf.j2"
+    dest: "/etc/mysql/conf.d/galera.cnf"
+
+- name: CHECK CLUSTER INITIALIZATION
+  ansible.builtin.shell: mysql -u root -p"{{ mariadb_root_password }}" -e 'show status like "wsrep_cluster_size"' | awk {'print $2'} | tail -n 1
+  register: check_init
+  when: inventory_hostname  == "visp-1"
+
+- name: CLUSTER INFO
+  ansible.builtin.debug:
+    msg:
+      "{{ (check_init.stdout=='0') | ternary('CLUSTER NOT INITIALISED, WE GONNA DO IT . . .','CLUSTER INITIALIZED, SKIPPING . . .')}}"
+  when: inventory_hostname  == "visp-1"
+
+- name: STOP VISP-1 TO INITIALIZE
+  become: true
+  ansible.builtin.service:
+    name: mysql
+    state: stopped
+  when: inventory_hostname  == "visp-1" and check_init.stdout == "0"
+
+- name: INITIALIZE CLUSTER
+  become: true
+  ansible.builtin.shell: galera_new_cluster
+  when: inventory_hostname  == "visp-1" and check_init.stdout == "0"
+
+- name: START MARIADBS
+  become: true
+  ansible.builtin.debug:
+    msg: STARTING MARIADBS
+  notify: START MARIADB
+
+- name: WAITING TO CONNECT NODES
+  ansible.builtin.pause: 
+    seconds: 5
+
+- name: TAKE INFO ABOUT CONNECTED NODES
+  ansible.builtin.shell: mysql -u root -pcrjhjcnm -e 'show status like "wsrep_cluster_size"' | awk {'print $2'} | tail -n 1
+  register: mariadb_result
+  when: inventory_hostname  == "visp-1"
+
+- name: RESULT | CONNECTED NODES
+  ansible.builtin.debug:
+    msg: "CONNECTED NODES: {{ mariadb_result.stdout }}"
+  when: inventory_hostname  == "visp-1"

@@ -1,2 +1,12 @@
 ---
-# handlers file for galera_cluster_install
+- name: STOP MARIADB
+  become: true
+  ansible.builtin.service:
+    name: mysql
+    state: stopped
+
+- name: START MARIADB
+  become: true
+  ansible.builtin.service:
+    name: mysql
+    state: started

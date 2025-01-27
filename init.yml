@@ -1,9 +1,15 @@
-- name: CONFIGURE VISP-1
-  gather_facts: false
-  hosts: visp-1
-  roles:
-    - role: ../roles/galera_cluster_install
-      tags: [ galera_cluster_install ]
+# - name: CONFIGURE TEST-SERVER
+#   gather_facts: false
+#   hosts: test-server
+#   roles:
+#    - role: ../roles/docker_install
+#      tags: [ docker_install ]
+#    - role: ../roles/redis_install
+#      tags: [ redis_install ]
+#    - role: ../roles/mariadb_install
+#      tags: [ mariadb_install ]
+#     - role: ../roles/galera_cluster_install
+#       tags: [ galera_cluster_install ]
 
 - name: CONFIGURE VISP-2
   gather_facts: false
@@ -23,3 +29,9 @@
     - role: ../roles/mariadb_install
       tags: [ mariadb_install ]
 
+- name: CONFIGURE VISP-1, VISP-2, VISP-3
+  gather_facts: false
+  hosts: visp-1, visp-2, visp-3
+  roles:
+    - role: ../roles/galera_cluster_install
+      tags: [ galera_cluster_install ]

@@ -37,6 +37,11 @@
   become: true
   ansible.builtin.shell: DEBIAN_FRONTEND=noninteractive apt-get install mariadb-server-{{ version_main }} -y -q
 
+- name: CONFIGURE ACCESS TO MARIADB
+  become: true
+  ansible.builtin.shell: mysql -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('{{ mariadb_root_password }}')" 
+  ignore_errors: yes
+
 - name: CHECK VERSION
   become: true
   ansible.builtin.command:

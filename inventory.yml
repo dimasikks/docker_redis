@@ -1,5 +1,9 @@
 all:
   hosts:
+    # test-server:
+    #   ansible_user: 
+    #   ansible_host: 
+    #   ansible_password: 
     visp-1:
       ansible_user: 
       ansible_host: 
